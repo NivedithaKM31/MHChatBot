@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Assistant Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .chat-box {
+      width: 90%;
+      max-width: 600px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: white;
+      overflow-y: scroll;
+      height: 400px;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .user-message {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .bot-message {
+      background-color: #f8d7da;
+      align-self: flex-start;
+      text-align: left;
+    }
+    .input-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .input-container input {
+      width: 80%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .input-container button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .input-container button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Medical Assistant Chatbot</h1>
+    <p>Get accurate medical insights</p>
+  </header>
+  <div class="chat-container">
+    <div class="chat-box" id="chat-box">
+      <!-- Chat messages will appear here -->
+    </div>
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Ask your medical question here..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+  <script>
+    async function sendMessage() {
+      const userInput = document.getElementById('user-input').value.trim();
+      if (!userInput) return;
+
+      const chatBox = document.getElementById('chat-box');
+      const userMessageDiv = document.createElement('div');
+      userMessageDiv.classList.add('message', 'user-message');
+      userMessageDiv.textContent = userInput;
+      chatBox.appendChild(userMessageDiv);
+
+      document.getElementById('user-input').value = '';
+
+      // Send the user's query to the backend
+      try {
+        const response = await fetch('/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: userInput })
+        });
+        const data = await response.json();
+
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.classList.add('message', 'bot-message');
+        botMessageDiv.textContent = data.response;
+        chatBox.appendChild(botMessageDiv);
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        console.error('Error:', error);
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.classList.add('message', 'bot-message');
+        botMessageDiv.textContent = 'Something went wrong. Please try again later.';
+        chatBox.appendChild(botMessageDiv);
+      }
+    }
+  </script>
+</body>
+</html>
